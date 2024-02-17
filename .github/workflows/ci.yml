@@ -13,36 +13,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
       - name: Install dependencies
         run: pip install requests
 
       - name: Bump version and update info.json
         run: |
-          pip install bump2version
-          bump2version --commit --tag
-
-          # Extract version number from setup.cfg
-          version=$(grep -oP 'version\s*=\s*\K[0-9]+\.[0-9]+\.[0-9]+' setup.cfg)
+          latest_tag=$(git describe --abbrev=0 --tags)
+          commit_count=$(git rev-list $latest_tag..HEAD --count)
+          echo "COMMITS_SINCE_LAST_TAG=$commit_count" >> $GITHUB_ENV
+          echo "Commits since last tag: $commit_count"
 
           # Replace version in info.json
-          sed -i "s/\"version\": \".*\"/\"version\": \"$version\"/" info.json
+          sed -i 's|  "version": .*,|  "version": "1.0.$commit_count"|g' info.json
 
       - name: Zip files excluding .py files
         run: |
-          version=$(grep -oP 'version\s*=\s*\K[0-9]+\.[0-9]+\.[0-9]+' setup.cfg)
-          mkdir H-QoL-FF-$version
-          find . -type f -not -name "*.py" -exec cp {} H-QoL-FF-$version \;
-          zip -r H-QoL-FF-$version.zip H-QoL-FF-$version
-          rm -rf H-QoL-FF-$version
+          mkdir H-QoL-FF-1.0.$commit_count
+          find . -type f -not -name "*.py" -exec cp {} H-QoL-FF-1.0.$commit_count \;
+          zip -r H-QoL-FF-1.0.$commit_count.zip H-QoL-FF-1.0.$commit_count
+          rm -rf H-QoL-FF-1.0.$commit_count
 
       - name: Upload zip file using Python script
         env:
           MOD_UPLOAD_API_KEY: ${{ secrets.MOD_UPLOAD_API_KEY }}
           MOD_UPLOAD_NAME: "H-Qol-FF"
-          MOD_UPLOAD_FILE: "./H-QoL-FF_$version.zip"
+          MOD_UPLOAD_FILE: "./H-QoL-FF-1.0.$commit_count.zip"
         run: python upload_script.py
