@@ -1,0 +1,48 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Bump version and update info.json
+        run: |
+          pip install bump2version
+          bump2version --commit --tag
+
+          # Extract version number from setup.cfg
+          version=$(grep -oP 'version\s*=\s*\K[0-9]+\.[0-9]+\.[0-9]+' setup.cfg)
+
+          # Replace version in info.json
+          sed -i "s/\"version\": \".*\"/\"version\": \"$version\"/" info.json
+
+      - name: Zip files excluding .py files
+        run: |
+          version=$(grep -oP 'version\s*=\s*\K[0-9]+\.[0-9]+\.[0-9]+' setup.cfg)
+          mkdir H-QoL-FF-$version
+          find . -type f -not -name "*.py" -exec cp {} H-QoL-FF-$version \;
+          zip -r H-QoL-FF-$version.zip H-QoL-FF-$version
+          rm -rf H-QoL-FF-$version
+
+      - name: Upload zip file using Python script
+        env:
+          MOD_UPLOAD_API_KEY: ${{ secrets.MOD_UPLOAD_API_KEY }}
+          MOD_UPLOAD_NAME: "H-Qol-FF"
+          MOD_UPLOAD_FILE: "./H-QoL-FF_$version.zip"
+        run: python upload_script.py
