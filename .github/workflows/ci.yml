@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Bump version and update info.json
+      - name: Set version and update info.json
         run: |
           latest_tag=$(git describe --abbrev=0 --tags)
           commit_count=$(git rev-list $latest_tag..HEAD --count)
