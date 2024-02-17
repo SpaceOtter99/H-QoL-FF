@@ -1,13 +1,20 @@
 import sys
 import requests
 from os import getenv
+import os
+
+def find_first_zip_file(directory="."):
+    for file in os.listdir(directory):
+        if file.endswith(".zip"):
+            return file
+    return None
 
 MOD_PORTAL_URL = "https://mods.factorio.com"
 INIT_UPLOAD_URL = f"{MOD_PORTAL_URL}/api/v2/mods/releases/init_upload"
 
 apikey = getenv("MOD_UPLOAD_API_KEY")
 modname = getenv("MOD_UPLOAD_NAME")
-zipfilepath = getenv("MOD_UPLOAD_FILE")
+zipfilepath = find_first_zip_file()
 
 request_body = data={"mod":modname}
 request_headers = {"Authorization": f"Bearer {apikey}"}

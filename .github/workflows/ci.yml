@@ -38,5 +38,4 @@ jobs:
         env:
           MOD_UPLOAD_API_KEY: ${{ secrets.MOD_UPLOAD_API_KEY }}
           MOD_UPLOAD_NAME: "H-QoL-FF"
-          MOD_UPLOAD_FILE: "./H-QoL-FF-1.0.$commit_count.zip"
         run: python upload_script.py
