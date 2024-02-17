@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Install dependencies
         run: pip install requests
@@ -35,6 +37,6 @@ jobs:
       - name: Upload zip file using Python script
         env:
           MOD_UPLOAD_API_KEY: ${{ secrets.MOD_UPLOAD_API_KEY }}
-          MOD_UPLOAD_NAME: "H-Qol-FF"
+          MOD_UPLOAD_NAME: "H-QoL-FF"
           MOD_UPLOAD_FILE: "./H-QoL-FF-1.0.$commit_count.zip"
         run: python upload_script.py
