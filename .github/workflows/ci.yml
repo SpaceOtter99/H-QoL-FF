@@ -18,8 +18,7 @@ jobs:
 
       - name: Set version and update info.json
         run: |
-          latest_tag=$(git describe --abbrev=0 --tags)
-          commit_count=$(git rev-list $latest_tag..HEAD --count)
+          commit_count=$(git rev-list --count main)
           echo "COMMITS_SINCE_LAST_TAG=$commit_count" >> $GITHUB_ENV
           echo "Commits since last tag: $commit_count"
 
