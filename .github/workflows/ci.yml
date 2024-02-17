@@ -25,7 +25,7 @@ jobs:
           echo "Commits since last tag: $commit_count"
 
           # Replace version in info.json
-          sed -i 's|  "version": .*,|  "version": "1.0.$commit_count"|g' info.json
+          sed -i 's|  "version": .*,|  "version": "1.0.$commit_count",|g' info.json
 
       - name: Zip files excluding .py files
         run: |
